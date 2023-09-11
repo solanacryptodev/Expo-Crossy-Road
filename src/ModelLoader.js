@@ -10,6 +10,7 @@ import Boulder from "./Node/Boulder";
 import RailRoad from "./Node/RailRoad";
 import TrainLight from "./Node/TrainLight";
 import LilyPad from "./Node/LilyPad";
+import Coin from "./Node/Coin";
 
 class ModelLoader {
   loadModels = async () => {
@@ -25,6 +26,7 @@ class ModelLoader {
     this._trainLight = new TrainLight();
     this._log = new Log();
     this._hero = new Hero();
+    this._coins = new Coin();
 
     // try {
     await Promise.all([
@@ -40,6 +42,7 @@ class ModelLoader {
       this._train.setup(),
       this._hero.setup(),
       this._trainLight.setup(),
+      this._coins.setup(),
     ]);
     console.log("Done Loading 3D Models!");
     // } catch (error) {

@@ -10,6 +10,12 @@ export default {
         texture: require('../assets/models/environment/grass/dark-grass.png'),
       },
     },
+    coins: {
+      '0': {
+        model: require('../assets/models/environment/coins/0/0.obj'),
+        texture: require('../assets/models/environment/coins/0/0.png'),
+      }
+    },
     road: {
       '0': {
         model: require('../assets/models/environment/road/model.obj'),

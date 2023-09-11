@@ -196,6 +196,8 @@ export default class Engine {
     this.onUpdateScore(position);
   };
 
+  updateCoinCollectionCount = () => {};
+
   moveWithDirection = (direction) => {
     if (this.isGameEnded()) {
       return;

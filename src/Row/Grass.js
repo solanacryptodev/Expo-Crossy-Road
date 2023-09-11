@@ -1,4 +1,4 @@
-import { Object3D } from 'three';
+import {Object3D, Mesh, BoxGeometry, MeshBasicMaterial} from 'three';
 
 import ModelLoader from '../../src/ModelLoader';
 import { groundLevel } from '../GameSettings';
@@ -12,10 +12,12 @@ export const Fill = {
 const HAS_WALLS = true;
 const HAS_OBSTACLES = true;
 const HAS_VARIETY = true;
+const HAS_COINS = true;
 
 export default class Grass extends Object3D {
   active = false;
   entities = [];
+  coins = [];
 
   top = 0.4;
   /*
@@ -36,10 +38,21 @@ export default class Grass extends Object3D {
     });
     this.entities = [];
     this.obstacleMap = {};
+    this.coinMap = {};
+    this.coins = [];
     this.treeGen(type);
+    this.coinGen(type);
   };
 
   obstacleMap = {};
+  coinMap = {};
+
+  addCoins = x => {
+    if ( HAS_COINS ) {
+      this.createCoin(x);
+    }
+  }
+
   addObstacle = x => {
     let mesh;
     if (HAS_VARIETY) {
@@ -54,6 +67,21 @@ export default class Grass extends Object3D {
     this.entities.push({ mesh });
     this.floor.add(mesh);
     mesh.position.set(x, groundLevel, 0);
+  };
+
+  coinGen = type => {
+    for (let x = -3; x < 12; x++) {
+      const _x = x - 4;
+
+      if (type === Fill.solid) continue;
+
+      // Decide if we're placing a coin on this row with a 30% chance
+      if (Math.random() < 0.3) {
+        this.addCoins(_x);
+        // Skip to the next row since we don't want more coins on this row
+        x += 1;
+      }
+    }
   };
 
   treeGen = type => {
@@ -75,6 +103,13 @@ export default class Grass extends Object3D {
         }
       }
 
+      // Only generate coins for every other x value to reduce the number of coins
+      // if (type !== Fill.solid && _x % 2 === 0) {
+      //   if (HAS_COINS) {
+      //     this.coinGen(_x);
+      //   }
+      // }
+
       if (HAS_OBSTACLES) {
         if (_rowCount < count) {
           if (_x !== 0 && Math.random() > 0.6) {
@@ -84,6 +119,14 @@ export default class Grass extends Object3D {
         }
       }
     }
+  };
+
+  createCoin = x => {
+    let mesh = ModelLoader._coins.getRandom();
+    this.coinMap[`${x | 0}`] = { index: this.entities.length };
+    this.entities.push({ mesh });
+    this.floor.add(mesh);
+    mesh.position.set(x, groundLevel, 0);
   };
 
   constructor(heroWidth, onCollide) {
