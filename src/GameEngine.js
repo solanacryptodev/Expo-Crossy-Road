@@ -19,6 +19,8 @@ import {
   sceneColor,
   startingRow,
 } from "./GameSettings";
+import React from "react";
+import GameContext from "../context/GameContext";
 
 const initialState = {
   id: Characters.bacon.id,
@@ -29,6 +31,8 @@ const initialState = {
 const normalizeAngle = (angle) => {
   return Math.atan2(Math.sin(angle), Math.cos(angle));
 };
+
+// const { setCoinCount } = React.useContext(GameContext)
 
 export default class Engine {
   updateScale = () => {
@@ -80,6 +84,9 @@ export default class Engine {
     }
     this._hero.isAlive = false;
     this._hero.stopIdle();
+    if ( collision === "coins") {
+      console.log('COLLISION WITH COIN');
+    }
     if (collision === "car") {
       AudioManager.playCarHitSound();
       AudioManager.playDeathSound();
@@ -147,6 +154,7 @@ export default class Engine {
     // this.drive();
 
     this.gameMap.tick(dt, this._hero);
+
 
     if (!this._hero.moving) {
       this._hero.moveOnEntity();

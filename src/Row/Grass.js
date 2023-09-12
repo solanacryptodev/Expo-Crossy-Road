@@ -103,13 +103,6 @@ export default class Grass extends Object3D {
         }
       }
 
-      // Only generate coins for every other x value to reduce the number of coins
-      // if (type !== Fill.solid && _x % 2 === 0) {
-      //   if (HAS_COINS) {
-      //     this.coinGen(_x);
-      //   }
-      // }
-
       if (HAS_OBSTACLES) {
         if (_rowCount < count) {
           if (_x !== 0 && Math.random() > 0.6) {
@@ -123,8 +116,10 @@ export default class Grass extends Object3D {
 
   createCoin = x => {
     let mesh = ModelLoader._coins.getRandom();
+    const collisionBoxSize = 1;
     this.coinMap[`${x | 0}`] = { index: this.entities.length };
-    this.entities.push({ mesh });
+    this.coins.push({ mesh, collisionBox: collisionBoxSize });
+    this.entities.push({ mesh, collisionBox: collisionBoxSize });
     this.floor.add(mesh);
     mesh.position.set(x, groundLevel, 0);
   };
@@ -137,4 +132,36 @@ export default class Grass extends Object3D {
     this.floor = _grass.getNode();
     this.add(this.floor);
   }
+
+  collectCoins = (dt, player) => {
+    this.coins.forEach((coin, index) => {
+      if (this.checkCoinCollision({ dt, coin, player })) {
+        // If there's a collision, handle it (e.g., increase score, remove coin)
+        this.handleCoinCollision(coin, index);
+      }
+    });
+  }
+
+  checkCoinCollision = ({ coin, player }) => {
+    if (Math.round(player.position.z) === this.position.z && player.isAlive) {
+      const { mesh, collisionBox } = coin;
+      if (
+          player.position.x < mesh.position.x + collisionBox &&
+          player.position.x > mesh.position.x - collisionBox
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  handleCoinCollision = (coin, index) => {
+    // this.onCollide(coin, 'coin');
+    // Remove coin from scene
+    this.floor.remove(coin.mesh);
+    // Remove coin from coins array
+    this.coins.splice(index, 1);
+    // Increase player's score or call a function that does
+    // player.collectCoin();
+  };
 }

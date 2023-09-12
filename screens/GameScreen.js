@@ -18,6 +18,7 @@ import GameOverScreen from "./GameOverScreen";
 import HomeScreen from "./HomeScreen";
 import SettingsScreen from "./SettingsScreen";
 import GameContext from "../context/GameContext";
+import CoinsText from "../components/CoinsText";
 
 const DEBUG_CAMERA_CONTROLS = false;
 class Game extends Component {
@@ -25,6 +26,7 @@ class Game extends Component {
   state = {
     ready: false,
     score: 0,
+    coins: 0,
     viewKey: 0,
     gameState: State.Game.none,
     showSettings: false,
@@ -253,6 +255,10 @@ class Game extends Component {
         <Score
           score={this.state.score}
           gameOver={this.state.gameState === State.Game.gameOver}
+        />
+        <CoinsText
+            coinsCollected={this.state.coins}
+            gameOver={this.state.gameState === State.Game.gameOver}
         />
         {this.renderGameOver()}
 

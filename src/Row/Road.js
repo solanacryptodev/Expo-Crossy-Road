@@ -106,7 +106,7 @@ export default class Road extends Object3D {
   };
 
   shouldCheckCollision = ({ player, car }) => {
-    if (Math.round(player.position.z) == this.position.z && player.isAlive) {
+    if (Math.round(player.position.z) === this.position.z && player.isAlive) {
       const { mesh, collisionBox } = car;
 
       if (

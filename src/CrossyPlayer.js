@@ -2,6 +2,7 @@ import { Group } from 'three';
 import { utils } from 'expo-three';
 import { BASE_ANIMATION_TIME, groundLevel, IDLE_DURING_GAME_PLAY, PLAYER_IDLE_SCALE, startingRow } from './GameSettings';
 import ModelLoader from '../src/ModelLoader';
+import {Power1, TimelineMax, TweenLite, TweenMax} from "gsap";
 
 const normalizeAngle = angle => {
   return Math.atan2(Math.sin(angle), Math.cos(angle));

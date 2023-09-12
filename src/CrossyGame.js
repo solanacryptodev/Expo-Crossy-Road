@@ -165,6 +165,9 @@ export class GameMap {
     const targetZ = `${position.z | 0}`;
     if (targetZ in this.floorMap) {
       const { type, entity } = this.floorMap[targetZ];
+      if (type === 'coin') {
+        console.log('COLLISION WITH COIN')
+      }
       if (type === 'grass') {
         const key = `${position.x | 0}`;
         if (key in entity.obstacleMap) {
@@ -217,6 +220,9 @@ export class CrossyGameMap extends GameMap {
     }
     for (const water of this.water.items) {
       water.update(dt, hero);
+    }
+    for (const grass of this.grasses.items) {
+      grass.collectCoins(dt, hero);
     }
   }
 
