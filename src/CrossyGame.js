@@ -9,6 +9,7 @@ import Feathers from './Particles/Feathers';
 import Water from './Particles/Water';
 import Rows from './Row';
 import { Fill } from './Row/Grass';
+import State from "./state";
 
 // TODO Add to state - disable/enable when battery is low
 const useParticles = true;
@@ -101,9 +102,11 @@ export class CrossyScene extends Scene {
 }
 
 export class CrossyCamera extends OrthographicCamera {
+  cameraSpeed = 0.03;
+
   constructor() {
     super(-1, 1, 1, -1, -30, 30);
-    this.position.set(-1, 2.8, -2.9); // Change -1 to -.02
+    this.position.set(-1, 2.8, -2.9);
     this.lookAt(0, 0, 0);
   }
 
@@ -112,6 +115,7 @@ export class CrossyCamera extends OrthographicCamera {
     this.right = width * scale;
     this.top = height * scale;
     this.bottom = -(height * scale);
+
     this.zoom = 300;
     this.updateProjectionMatrix();
   };

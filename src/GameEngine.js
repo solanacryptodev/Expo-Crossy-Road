@@ -1,26 +1,11 @@
-import { Dimensions } from "react-native";
+import {Dimensions} from "react-native";
 
-import { swipeDirections } from "../components/GestureView";
+import {swipeDirections} from "../components/GestureView";
 import AudioManager from "../src/AudioManager";
-import ModelLoader from "../src/ModelLoader";
 import Characters from "./Characters";
-import {
-  CrossyCamera,
-  CrossyGameMap,
-  CrossyRenderer,
-  CrossyScene,
-} from "./CrossyGame";
+import {CrossyCamera, CrossyGameMap, CrossyRenderer, CrossyScene,} from "./CrossyGame";
 import CrossyPlayer from "./CrossyPlayer";
-import {
-  CAMERA_EASING,
-  DEBUG_CAMERA_CONTROLS,
-  groundLevel,
-  PI_2,
-  sceneColor,
-  startingRow,
-} from "./GameSettings";
-import React from "react";
-import GameContext from "../context/GameContext";
+import {CAMERA_EASING, DEBUG_CAMERA_CONTROLS, groundLevel, PI_2, sceneColor, startingRow,} from "./GameSettings";
 
 const initialState = {
   id: Characters.bacon.id,
@@ -37,6 +22,7 @@ const normalizeAngle = (angle) => {
 export default class Engine {
   updateScale = () => {
     const { width, height, scale } = Dimensions.get("window");
+    console.log("dimensions", width, height, scale);
     if (this.camera) {
       this.camera.updateScale({ width, height, scale });
     }
@@ -46,6 +32,7 @@ export default class Engine {
   };
 
   setupGame = (character) => {
+    this.successfulMoves = 0;  // Initialize the counter
     this.scene = new CrossyScene({});
 
     this.camera = new CrossyCamera();
@@ -103,7 +90,7 @@ export default class Engine {
   init = () => {
     this.onGameInit();
 
-    this.camera.position.z = 1;
+    this.animateCamera();
     this._hero.reset();
 
     this.scene.resetParticles(this._hero.position);
@@ -148,12 +135,17 @@ export default class Engine {
     // this.gameState = State.Game.gameOver;
 
     // this.props.setGameState(this.gameState);
+    this.camera.cameraSpeed = 0.03
   };
 
   tick = (dt) => {
     // this.drive();
 
     this.gameMap.tick(dt, this._hero);
+
+    if (this._hero.isAlive) {
+      this.checkIfUserHasFallenOutOfFrame();
+    }
 
 
     if (!this._hero.moving) {
@@ -164,11 +156,29 @@ export default class Engine {
     this.forwardScene();
   };
 
+  animateCamera = () => {
+    if (!this.camera || !this._hero) return;
+
+    this.camera.position.y += this.camera.cameraSpeed;
+
+    this.camera.updateProjectionMatrix();
+
+    // Request next frame
+    requestAnimationFrame(this.animateCamera);
+  };
+
   checkIfUserHasFallenOutOfFrame = () => {
     if (this.isGameEnded()) {
       return;
     }
-    if (this._hero.position.z < this.camera.position.z - 1) {
+    // Considering a small buffer so hero doesn't have to go completely out of view
+    const buffer = 13;
+    const { height, scale } = Dimensions.get("window");
+    const offset = height * scale - buffer;
+    const cameraBottomBoundaryInWorld = this.camera.position.y + this.camera.bottom + offset;
+
+    // Check if fallen below camera view
+    if (this._hero.position.y < cameraBottomBoundaryInWorld) {
       this.scene.rumble();
       this.gameOver();
       AudioManager.playDeathSound();
